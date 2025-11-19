@@ -329,12 +329,20 @@ th {
   border-width: 0;
 }
 
+.bi-dash-circle{
+  cursor: pointer;
+}
+
 label {
   display: inline-block;
 }
 
 button {
   border-radius: 0;
+}
+
+button:hover {
+  background-color: #0a58ca !important ;
 }
 
 button:focus:not(:focus-visible) {

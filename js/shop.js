@@ -84,6 +84,7 @@ const buy = (id) => {
         productInCart.quantity++;
         productInCart.subTotal = productInCart.subTotal + productInCart.price
     } 
+
     calculateTotal()
     applyPromotionsCart()
     printCart()
@@ -105,9 +106,9 @@ const calculateTotal = () =>  {
 const applyPromotionsCart = () =>  {
     cart.forEach(product =>{
         if (product.offer) {
-            if (product.quantity >= product.offer.number){
-                product.subtotalWithDiscount = product.subTotal - product.subTotal*product.offer.percent/100
-            }
+            product.quantity >= product.offer.number
+                ? product.subtotalWithDiscount = product.subTotal - product.subTotal*product.offer.percent/100
+                : product.subtotalWithDiscount = undefined
         }
     })
     calculateTotal();
@@ -123,6 +124,12 @@ const printCart = () => {
 			<td>${p.price}</td>
 			<td>${p.quantity}</td>
 			<td>${p.subtotalWithDiscount ? p.subtotalWithDiscount : p.subTotal}</td>
+			<td onclick="shop.removeFromCart(${p.id})">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                    <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                </svg>
+            </td>
 		</tr>`
     ).join('');
 
@@ -135,7 +142,19 @@ const printCart = () => {
 
 // Exercise 7
 const removeFromCart = (id) => {
+    const productToRemove = cart.find(product => product.id === id)
 
+    if (productToRemove.quantity > 1) {
+        productToRemove.quantity--;
+        productToRemove.subTotal = productToRemove.price * productToRemove.quantity
+    } else {
+        const index = cart.findIndex(p => p.id === productToRemove.id);
+        cart.splice(index, 1);
+    }
+
+    calculateTotal()
+    applyPromotionsCart()
+    printCart()
 }
 
 const open_modal = () =>  {
