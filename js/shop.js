@@ -70,34 +70,64 @@ const products = [
 // ** Don't hesitate to seek help from your peers or your mentor if you still struggle with debugging.
 
 // Improved version of cartList. Cart is an array of products (objects), but each one has a quantity field to define its quantity, so these products are not repeated.
-const cart = [];
+let cart = [];
 
-const total = 0;
+let total = 0;
 
 // Exercise 1
 const buy = (id) => {
-    // 1. Loop for to the array products to get the item to add to cart
-    // 2. Add found product to the cart array
+    const buyingProduct = products.find(product => product.id === +id);
+    const productInCart = cart.find(product => product.id === buyingProduct.id)
+
+    if(!productInCart) cart.push({...buyingProduct,  quantity: 1, subTotal: buyingProduct.price}) 
+    else {
+        productInCart.quantity++;
+        productInCart.subTotal = productInCart.subTotal + productInCart.price
+    } 
+    calculateTotal()
+    applyPromotionsCart()
+    printCart()
 }
 
 // Exercise 2
 const cleanCart = () =>  {
-
+    cart = []
+    total = 0
+    printCart()
 }
 
 // Exercise 3
 const calculateTotal = () =>  {
-    // Calculate total price of the cart using the "cartList" array
+   total = cart.reduce((acc, product) => acc + (product.subtotalWithDiscount ? product.subtotalWithDiscount : product.subTotal), 0)
 }
 
 // Exercise 4
 const applyPromotionsCart = () =>  {
-    // Apply promotions to each item in the array "cart"
+    cart.forEach(product =>{
+        if (product.offer) {
+            if (product.quantity >= product.offer.number){
+                product.subtotalWithDiscount = product.subTotal - product.subTotal*product.offer.percent/100
+            }
+        }
+    })
+    calculateTotal();
 }
 
 // Exercise 5
 const printCart = () => {
-    // Fill the shopping cart modal manipulating the shopping cart dom
+    const list = document.getElementById('cart_list');
+
+    list.innerHTML = cart.map(p => 
+        `<tr>
+			<th scope="row">${p.name}</th>
+			<td>${p.price}</td>
+			<td>${p.quantity}</td>
+			<td>${p.subtotalWithDiscount ? p.subtotalWithDiscount : p.subTotal}</td>
+		</tr>`
+    ).join('');
+
+    const quantityProductsCart = cart.map(product => product.quantity).reduce((acc, quantity) => acc + quantity, 0)
+    document.getElementById('count_product').textContent = quantityProductsCart;
 }
 
 
@@ -111,3 +141,15 @@ const removeFromCart = (id) => {
 const open_modal = () =>  {
     printCart();
 }
+
+export const shop = {
+    buy,
+    cleanCart,
+    calculateTotal,
+    applyPromotionsCart,
+    printCart,
+    removeFromCart,
+    open_modal: () => printCart(),
+};
+
+window.shop = shop;
